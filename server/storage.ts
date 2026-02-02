@@ -1,4 +1,4 @@
-import { db } from "./db";
+// import { db } from "./db"; // DB disabled for local run
 import {
   alerts, devices, incidents, logs,
   type Alert, type InsertAlert,
@@ -6,7 +6,7 @@ import {
   type Incident, type InsertIncident,
   type Log, type InsertLog
 } from "@shared/schema";
-import { eq, desc } from "drizzle-orm";
+// import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // Alerts
@@ -29,64 +29,105 @@ export interface IStorage {
   createLog(log: InsertLog): Promise<Log>;
 }
 
-export class DatabaseStorage implements IStorage {
+export class MemStorage implements IStorage {
+  private alerts: Alert[] = [];
+  private devices: Device[] = [];
+  private incidents: Incident[] = [];
+  private logs: Log[] = [];
+
+  private alertId = 1;
+  private deviceId = 1;
+  private incidentId = 1;
+  private logId = 1;
+
+  constructor() {
+    // Seed some initial data if needed
+  }
+
   // Alerts
   async getAlerts(): Promise<Alert[]> {
-    return await db.select().from(alerts).orderBy(desc(alerts.timestamp));
+    return this.alerts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }
 
   async createAlert(insertAlert: InsertAlert): Promise<Alert> {
-    const [alert] = await db.insert(alerts).values(insertAlert).returning();
+    const alert: Alert = {
+      ...insertAlert,
+      id: this.alertId++,
+      timestamp: new Date(),
+      status: insertAlert.status ?? 'active',
+      metadata: insertAlert.metadata ?? {}
+    };
+    this.alerts.push(alert);
     return alert;
   }
 
   async updateAlert(id: number, updates: Partial<InsertAlert>): Promise<Alert> {
-    const [alert] = await db.update(alerts)
-      .set(updates)
-      .where(eq(alerts.id, id))
-      .returning();
-    return alert;
+    const index = this.alerts.findIndex(a => a.id === id);
+    if (index === -1) throw new Error("Alert not found");
+    const updated = { ...this.alerts[index], ...updates };
+    this.alerts[index] = updated;
+    return updated;
   }
 
   // Devices
   async getDevices(): Promise<Device[]> {
-    return await db.select().from(devices).orderBy(devices.name);
+    return this.devices;
   }
 
   async getDevice(id: number): Promise<Device | undefined> {
-    const [device] = await db.select().from(devices).where(eq(devices.id, id));
-    return device;
+    return this.devices.find(d => d.id === id);
   }
 
   async createDevice(insertDevice: InsertDevice): Promise<Device> {
-    const [device] = await db.insert(devices).values(insertDevice).returning();
+    const device: Device = {
+      ...insertDevice,
+      id: this.deviceId++,
+      lastPing: new Date(),
+      battery: insertDevice.battery ?? null,
+      ipAddress: insertDevice.ipAddress ?? null,
+      videoUrl: insertDevice.videoUrl ?? null
+    };
+    this.devices.push(device);
     return device;
   }
 
   // Incidents
   async getIncidents(): Promise<Incident[]> {
-    return await db.select().from(incidents).orderBy(desc(incidents.createdAt));
+    return this.incidents.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   async getIncident(id: number): Promise<Incident | undefined> {
-    const [incident] = await db.select().from(incidents).where(eq(incidents.id, id));
-    return incident;
+    return this.incidents.find(i => i.id === id);
   }
 
   async createIncident(insertIncident: InsertIncident): Promise<Incident> {
-    const [incident] = await db.insert(incidents).values(insertIncident).returning();
+    const now = new Date();
+    const incident: Incident = {
+      ...insertIncident,
+      id: this.incidentId++,
+      createdAt: now,
+      updatedAt: now,
+      status: insertIncident.status ?? 'open'
+    };
+    this.incidents.push(incident);
     return incident;
   }
 
   // Logs
   async getLogs(): Promise<Log[]> {
-    return await db.select().from(logs).orderBy(desc(logs.timestamp)).limit(100);
+    return this.logs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }
 
   async createLog(insertLog: InsertLog): Promise<Log> {
-    const [log] = await db.insert(logs).values(insertLog).returning();
+    const log: Log = {
+      ...insertLog,
+      id: this.logId++,
+      timestamp: new Date(),
+      details: insertLog.details ?? null
+    };
+    this.logs.push(log);
     return log;
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemStorage();

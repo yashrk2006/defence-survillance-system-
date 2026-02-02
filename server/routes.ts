@@ -75,15 +75,15 @@ export async function registerRoutes(
   // Note: This runs on server start but checking if data exists first
   const existingDevices = await storage.getDevices();
   if (existingDevices.length === 0) {
-    await storage.createDevice({ name: "Cam-01 Main Gate", type: "camera", status: "online", location: "Zone A", ipAddress: "192.168.1.101", battery: null });
-    await storage.createDevice({ name: "Cam-02 Loading Dock", type: "camera", status: "online", location: "Zone B", ipAddress: "192.168.1.102", battery: null });
-    await storage.createDevice({ name: "Drone-Alpha", type: "drone", status: "warning", location: "Perimeter", ipAddress: "192.168.1.201", battery: 34 });
-    await storage.createDevice({ name: "Sensor-Perimeter-N", type: "sensor", status: "online", location: "North Wall", ipAddress: "192.168.1.55", battery: 88 });
-    
+    await storage.createDevice({ name: "Cam-01 Main Gate", type: "camera", status: "online", location: "Zone A", ipAddress: "192.168.1.101", battery: null, videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4" });
+    await storage.createDevice({ name: "Cam-02 Loading Dock", type: "camera", status: "online", location: "Zone B", ipAddress: "192.168.1.102", battery: null, videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" });
+    await storage.createDevice({ name: "Drone-Alpha", type: "drone", status: "warning", location: "Perimeter", ipAddress: "192.168.1.201", battery: 34, videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" });
+    await storage.createDevice({ name: "Sensor-Perimeter-N", type: "sensor", status: "online", location: "North Wall", ipAddress: "192.168.1.55", battery: 88, videoUrl: null });
+
     await storage.createAlert({ title: "Perimeter Breach", description: "Motion detected in Zone A (North)", severity: "critical", status: "active", location: "Zone A" });
     await storage.createAlert({ title: "Drone Battery Low", description: "Drone-Alpha battery below 35%", severity: "medium", status: "active", location: "Perimeter" });
     await storage.createAlert({ title: "Connection Lost", description: "Cam-04 signal lost for >10s", severity: "high", status: "resolved", location: "Zone C" });
-    
+
     await storage.createLog({ level: "info", action: "System Startup", user: "SYSTEM", details: "Initialization complete" });
     await storage.createLog({ level: "warning", action: "Auth Failed", user: "unknown", details: "Failed login attempt from 10.0.0.5" });
   }

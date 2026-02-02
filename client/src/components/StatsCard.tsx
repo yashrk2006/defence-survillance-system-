@@ -13,7 +13,7 @@ interface StatsCardProps {
 export function StatsCard({ title, value, icon: Icon, trend, trendUp, alert }: StatsCardProps) {
   return (
     <div className={cn(
-      "bg-card border border-white/5 rounded-lg p-5 relative overflow-hidden group hover:border-white/10 transition-colors",
+      "bg-card border border-white/5 rounded-lg p-5 relative overflow-hidden group hover:border-white/10 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-black/20",
       alert && "border-red-500/20 bg-red-950/10"
     )}>
       {alert && (
@@ -24,7 +24,7 @@ export function StatsCard({ title, value, icon: Icon, trend, trendUp, alert }: S
           </span>
         </div>
       )}
-      
+
       <div className="flex justify-between items-start mb-4">
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{title}</p>
@@ -34,7 +34,7 @@ export function StatsCard({ title, value, icon: Icon, trend, trendUp, alert }: S
           <Icon className="h-5 w-5" />
         </div>
       </div>
-      
+
       {trend && (
         <div className="flex items-center text-xs">
           <span className={cn(

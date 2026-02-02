@@ -13,12 +13,17 @@ import Logs from "@/pages/Logs";
 import Settings from "@/pages/Settings";
 import NotFound from "@/pages/not-found";
 
+import Playback from "@/pages/Playback";
+import MapView from "@/pages/MapView";
+
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/monitoring" component={Monitoring} />
+      <Route path="/playback" component={Playback} />
+      <Route path="/map" component={MapView} />
       <Route path="/alerts" component={Alerts} />
       <Route path="/devices" component={Devices} />
       <Route path="/logs" component={Logs} />

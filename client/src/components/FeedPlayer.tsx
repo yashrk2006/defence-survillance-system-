@@ -8,15 +8,17 @@ interface FeedPlayerProps {
   name: string;
   status: "online" | "offline" | "warning";
   active?: boolean;
+  videoUrl?: string | null;
 }
 
-export function FeedPlayer({ id, name, status, active }: FeedPlayerProps) {
+export function FeedPlayer({ id, name, status, active, videoUrl }: FeedPlayerProps) {
   const [detection, setDetection] = useState<null | { type: 'person' | 'vehicle', conf: number, x: number, y: number }>(null);
 
   // Simulate detections
   useEffect(() => {
     if (status !== 'online') return;
-    
+
+    // Only simulate detection boxes if we have video or it's active
     const interval = setInterval(() => {
       if (Math.random() > 0.7) {
         setDetection({
@@ -41,25 +43,36 @@ export function FeedPlayer({ id, name, status, active }: FeedPlayerProps) {
       <div className="absolute inset-0 flex items-center justify-center bg-zinc-900">
         {status === 'online' ? (
           <div className="w-full h-full relative overflow-hidden">
-            {/* Grid Pattern */}
-            <div className="absolute inset-0" 
-              style={{ 
-                backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)', 
-                backgroundSize: '40px 40px' 
-              }} 
+            {videoUrl ? (
+              <video
+                src={videoUrl}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="w-full h-full object-cover opacity-80"
+              />
+            ) : null}
+
+            {/* Grid Pattern overlay - always visible for tech feel */}
+            <div className="absolute inset-0 pointer-events-none"
+              style={{
+                backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
+                backgroundSize: '40px 40px'
+              }}
             />
             {/* Scanline */}
             <div className="absolute inset-0 scanline opacity-20" />
-            
+
             {/* Simulated Detection Box */}
             {detection && (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0 }}
                 className="absolute border-2 border-red-500 bg-red-500/10"
-                style={{ 
-                  left: `${detection.x}%`, 
+                style={{
+                  left: `${detection.x}%`,
                   top: `${detection.y}%`,
                   width: '15%',
                   height: '25%'
@@ -73,7 +86,7 @@ export function FeedPlayer({ id, name, status, active }: FeedPlayerProps) {
             )}
 
             <div className="absolute bottom-0 right-0 p-8 opacity-20">
-               <Activity size={64} />
+              <Activity size={64} />
             </div>
           </div>
         ) : (
@@ -97,12 +110,12 @@ export function FeedPlayer({ id, name, status, active }: FeedPlayerProps) {
         </div>
 
         <div className="flex justify-between items-end opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-           <div className="text-[10px] font-mono text-white/50">
-             FPS: 30 / BIT: 4096
-           </div>
-           <button className="p-1.5 bg-black/60 hover:bg-white/10 rounded text-white pointer-events-auto transition-colors">
-             <Maximize2 size={16} />
-           </button>
+          <div className="text-[10px] font-mono text-white/50">
+            FPS: 30 / BIT: 4096
+          </div>
+          <button className="p-1.5 bg-black/60 hover:bg-white/10 rounded text-white pointer-events-auto transition-colors">
+            <Maximize2 size={16} />
+          </button>
         </div>
       </div>
     </div>

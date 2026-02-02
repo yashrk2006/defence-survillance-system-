@@ -43,6 +43,7 @@ export const devices = pgTable("devices", {
   lastPing: timestamp("last_ping").defaultNow().notNull(),
   battery: integer("battery"), // Percentage, nullable for wired devices
   ipAddress: text("ip_address"),
+  videoUrl: text("video_url"),
 });
 
 export const incidents = pgTable("incidents", {

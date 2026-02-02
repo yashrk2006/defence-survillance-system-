@@ -1,14 +1,16 @@
 import { Link, useLocation } from "wouter";
-import { 
-  LayoutDashboard, 
-  Activity, 
-  ShieldAlert, 
-  Video, 
-  HardDrive, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Activity,
+  ShieldAlert,
+  Video,
+  HardDrive,
+  Settings,
   LogOut,
   Menu,
-  X
+  X,
+  Film,
+  Map
 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
@@ -17,9 +19,11 @@ import { motion, AnimatePresence } from "framer-motion";
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/monitoring", label: "Live Monitoring", icon: Video },
-  { href: "/alerts", label: "Alerts & Incidents", icon: ShieldAlert },
-  { href: "/devices", label: "Assets & Devices", icon: HardDrive },
-  { href: "/logs", label: "System Logs", icon: Activity },
+  { href: "/playback", label: "Playback", icon: Film },
+  { href: "/map", label: "Geo-Map", icon: Map },
+  { href: "/alerts", label: "Alerts", icon: ShieldAlert },
+  { href: "/devices", label: "Assets", icon: HardDrive },
+  { href: "/logs", label: "Logs", icon: Activity },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
@@ -30,7 +34,7 @@ export function Sidebar() {
   return (
     <>
       {/* Mobile Toggle */}
-      <button 
+      <button
         onClick={toggleSidebar}
         className="fixed top-4 left-4 z-50 md:hidden p-2 bg-card border border-white/10 rounded-md text-white"
       >
@@ -68,11 +72,11 @@ export function Sidebar() {
                 const Icon = item.icon;
                 return (
                   <Link key={item.href} href={item.href}>
-                    <div 
+                    <div
                       className={cn(
                         "flex items-center px-3 py-2.5 rounded-md text-sm font-medium transition-colors cursor-pointer group relative",
-                        isActive 
-                          ? "bg-white/10 text-white" 
+                        isActive
+                          ? "bg-white/10 text-white"
                           : "text-muted-foreground hover:bg-white/5 hover:text-white"
                       )}
                     >
