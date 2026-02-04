@@ -44,6 +44,8 @@ export const devices = pgTable("devices", {
   battery: integer("battery"), // Percentage, nullable for wired devices
   ipAddress: text("ip_address"),
   videoUrl: text("video_url"),
+  x: integer("x").default(2500),
+  y: integer("y").default(2500),
 });
 
 export const incidents = pgTable("incidents", {

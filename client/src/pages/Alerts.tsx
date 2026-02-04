@@ -1,6 +1,6 @@
 import { Layout } from "@/components/Layout";
 import { useAlerts } from "@/hooks/use-alerts";
-import { AlertTriangle, Filter, Download, Shield, Clock, MapPin, Search, AlertOctagon, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, Filter, Download, Shield, Clock, MapPin, Search, AlertOctagon, CheckCircle2, Calendar, Archive, Eye, X, Crosshair } from "lucide-react";
 import { format } from "date-fns";
 import { PageTransition } from "@/components/ui/PageTransition";
 import { cn } from "@/lib/utils";
@@ -10,8 +10,17 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Alerts() {
   const { data: alerts } = useAlerts();
   const [filter, setFilter] = useState<string>('all');
+  const [search, setSearch] = useState("");
+  const [timeFilter, setTimeFilter] = useState<'24h' | '7d' | '30d'>('24h');
+  const [viewAlert, setViewAlert] = useState<any>(null); // For map modal
 
   const filteredAlerts = alerts?.filter(alert => {
+    const matchesSearch = alert.title.toLowerCase().includes(search.toLowerCase()) ||
+      alert.description.toLowerCase().includes(search.toLowerCase()) ||
+      alert.location.toLowerCase().includes(search.toLowerCase());
+
+    if (!matchesSearch) return false;
+
     if (filter === 'all') return true;
     if (filter === 'critical') return alert.severity === 'critical';
     if (filter === 'active') return alert.status === 'active';
@@ -20,40 +29,82 @@ export default function Alerts() {
 
   return (
     <Layout>
-      <PageTransition className="space-y-6">
+      <PageTransition className="space-y-8 relative">
         {/* Header HUD */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-4 border-b border-white/10 pb-6">
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/5 pb-10 relative">
+          <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-red-500/20 via-transparent to-transparent" />
+
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <AlertOctagon className="h-5 w-5 text-red-500" />
-              <h1 className="text-2xl font-bold text-white tracking-tight uppercase">Threat Logs</h1>
+            <div className="flex items-center gap-4 mb-2">
+              <div className="relative">
+                <div className="absolute inset-0 bg-red-500/20 blur-md animate-pulse" />
+                <div className="relative p-2.5 bg-zinc-900 border border-white/10 rounded">
+                  <AlertOctagon className="h-6 w-6 text-white" />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-4xl font-black text-white tracking-widest uppercase leading-none">THREAT_MATIX</h1>
+                <p className="text-[10px] text-zinc-500 font-mono tracking-[0.4em] uppercase mt-2">ANOMALY_DETECTION // REAL_TIME_STREAM</p>
+              </div>
             </div>
-            <p className="text-muted-foreground text-xs font-mono tracking-wider">REAL-TIME SECURITY NOTIFICATIONS</p>
           </div>
-          <div className="flex gap-2">
-            <button className="px-3 py-1.5 bg-black/40 hover:bg-white/10 text-[10px] font-mono font-bold uppercase text-white rounded border border-white/10 transition-colors flex items-center gap-2">
-              <Download className="h-3 w-3" /> Export_Log
+
+          <div className="flex gap-3">
+            <div className="bg-black/80 backdrop-blur-xl border border-white/10 rounded-lg p-1.5 flex items-center shadow-xl">
+              <span className="text-[9px] font-black text-zinc-500 uppercase tracking-widest px-3 border-r border-white/10 mr-2">Timeframe</span>
+              {['24h', '7d', '30d'].map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTimeFilter(t as any)}
+                  className={cn(
+                    "px-3 py-1.5 text-[9px] font-black uppercase rounded transition-all font-mono tracking-widest",
+                    timeFilter === t ? "bg-white/10 text-white" : "text-zinc-600 hover:text-zinc-300"
+                  )}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+            <button className="px-5 py-2.5 bg-black/80 hover:bg-white/10 text-[10px] font-mono font-black uppercase text-white rounded-lg border border-white/10 transition-all shadow-xl flex items-center gap-3 group">
+              <Download className="h-4 w-4 text-zinc-500 group-hover:text-white" /> EXPORT_AUDIT
             </button>
           </div>
         </div>
 
-        <div className="bg-black/40 backdrop-blur-md border border-white/10 rounded-sm overflow-hidden flex flex-col min-h-[600px]">
-          {/* Tactical Filters */}
-          <div className="p-3 border-b border-white/10 flex gap-2 overflow-x-auto bg-white/5">
-            {['all', 'critical', 'high', 'active'].map((status) => (
-              <button
-                key={status}
-                className={cn(
-                  "px-4 py-1.5 rounded-sm text-[10px] font-bold font-mono uppercase tracking-wider transition-all border",
-                  filter === status
-                    ? "bg-red-500/20 text-red-400 border-red-500/50"
-                    : "bg-transparent text-zinc-500 border-transparent hover:text-white hover:bg-white/5"
-                )}
-                onClick={() => setFilter(status)}
-              >
-                {status}
-              </button>
-            ))}
+        <div className="bg-black/60 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden flex flex-col min-h-[600px] shadow-2xl relative">
+          {/* HUD Accents */}
+          <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-white/20" />
+          <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-white/20" />
+
+          {/* Tactical Filters & Search */}
+          <div className="p-4 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between bg-white/[0.02]">
+            <div className="flex gap-3 overflow-x-auto no-scrollbar">
+              {['all', 'critical', 'high', 'active'].map((status) => (
+                <button
+                  key={status}
+                  className={cn(
+                    "px-5 py-2 rounded-lg text-[9px] font-black font-mono uppercase tracking-[0.2em] transition-all border",
+                    filter === status
+                      ? "bg-red-500/10 text-red-500 border-red-500/30 shadow-[inset_0_0_10px_rgba(239,68,68,0.1)]"
+                      : "bg-transparent text-zinc-600 border-transparent hover:text-zinc-400 hover:bg-white/5"
+                  )}
+                  onClick={() => setFilter(status)}
+                >
+                  {status === 'all' ? 'SYST_ALL' : status}
+                </button>
+              ))}
+            </div>
+
+            <div className="relative group w-full md:w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-600 group-focus-within:text-white transition-colors" />
+              <input
+                type="text"
+                placeholder="SEARCH_LOGS..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-black/40 border border-white/10 rounded-lg pl-10 pr-4 py-2 text-[10px] font-mono text-white focus:outline-none focus:border-white/30 transition-all uppercase placeholder:text-zinc-700"
+              />
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-2">
@@ -66,13 +117,13 @@ export default function Alerts() {
                   exit={{ opacity: 0, x: 10 }}
                   key={alert.id}
                   className={cn(
-                    "p-3 border-l-2 bg-gradient-to-r transition-all group hover:pl-4",
+                    "p-3 border-l-2 bg-gradient-to-r transition-all group hover:pl-4 relative overflow-hidden",
                     alert.severity === 'critical' ? "border-red-500 from-red-500/10 to-transparent" :
                       alert.severity === 'high' ? "border-orange-500 from-orange-500/10 to-transparent" :
                         "border-blue-500 from-blue-500/10 to-transparent"
                   )}
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className="flex items-start justify-between gap-4 relative z-10">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         {alert.severity === 'critical' && <AlertTriangle className="h-3 w-3 text-red-500 animate-pulse" />}
@@ -100,9 +151,14 @@ export default function Alerts() {
                       </div>
                     </div>
 
-                    <button className="opacity-0 group-hover:opacity-100 transition-opacity px-3 py-1 text-[10px] font-bold uppercase text-white border border-white/10 hover:bg-white/10 hover:border-white/30">
-                      View_Raw
-                    </button>
+                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => setViewAlert(alert)} className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors" title="View Map Context">
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button className="p-2 text-zinc-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors" title="Archive Alert">
+                        <Archive className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -116,7 +172,69 @@ export default function Alerts() {
             )}
           </div>
         </div>
+
+        {/* Alert Map Visualization Modal */}
+        <AnimatePresence>
+          {viewAlert && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setViewAlert(null)}
+                className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+              />
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="bg-black border border-white/10 rounded-2xl overflow-hidden relative z-10 w-full max-w-2xl shadow-2xl"
+              >
+                <div className="h-80 bg-zinc-900 relative">
+                  {/* Mock Map Background */}
+                  <div className="absolute inset-0 opacity-20 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover bg-center grayscale" />
+                  {/* Grid Overlay */}
+                  <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]" />
+
+                  {/* Ping Location */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <div className="relative">
+                      <div className="w-4 h-4 bg-red-500 rounded-full animate-ping absolute inset-0" />
+                      <div className="w-4 h-4 bg-red-500 rounded-full relative shadow-[0_0_20px_#ef4444] border-2 border-white" />
+                    </div>
+                  </div>
+                  <div className="absolute top-1/2 left-1/2 mt-6 -translate-x-1/2 bg-black/80 px-3 py-1 rounded text-[10px] font-black text-white uppercase tracking-widest border border-white/10 whitespace-nowrap">
+                    LOC: {viewAlert.location}
+                  </div>
+
+                  <div className="absolute top-4 left-4">
+                    <span className="text-[10px] font-mono text-red-500 uppercase tracking-widest bg-red-500/10 px-2 py-1 rounded border border-red-500/20">Satellite_Link_Active</span>
+                  </div>
+                </div>
+
+                <div className="p-6 bg-zinc-950 border-t border-white/10">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="text-lg font-black text-white uppercase tracking-widest">{viewAlert.title}</h3>
+                      <p className="text-xs text-zinc-500 font-mono tracking-wider">{format(new Date(viewAlert.timestamp), 'PPP p')} // ID: {viewAlert.id}</p>
+                    </div>
+                    <button onClick={() => setViewAlert(null)} className="p-2 hover:bg-white/10 rounded-full transition-all">
+                      <X className="h-5 w-5 text-zinc-400" />
+                    </button>
+                  </div>
+                  <p className="text-sm text-zinc-300 leading-relaxed font-light">{viewAlert.description}</p>
+
+                  <div className="mt-6 flex justify-end gap-3">
+                    <button onClick={() => setViewAlert(null)} className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] font-black text-white uppercase tracking-widest transition-all">Dismiss</button>
+                    <button onClick={() => setViewAlert(null)} className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-[10px] font-black text-white uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(239,68,68,0.4)]">Dispatch_Unit</button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </PageTransition>
     </Layout>
   );
 }
+

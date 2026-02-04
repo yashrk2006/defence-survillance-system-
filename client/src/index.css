@@ -6,38 +6,50 @@
 
 :root {
   /* Neutral Palette - Serious Command Center */
-  --background: 0 0% 10%;      /* #1a1a1a */
-  --foreground: 0 0% 95%;      /* #f2f2f2 */
-  
-  --card: 0 0% 13%;            /* #212121 */
-  --card-foreground: 0 0% 95%; /* #f2f2f2 */
-  
+  --background: 0 0% 10%;
+  /* #1a1a1a */
+  --foreground: 0 0% 95%;
+  /* #f2f2f2 */
+
+  --card: 0 0% 13%;
+  /* #212121 */
+  --card-foreground: 0 0% 95%;
+  /* #f2f2f2 */
+
   --popover: 0 0% 13%;
   --popover-foreground: 0 0% 95%;
-  
-  --primary: 0 0% 90%;         /* #e5e5e5 - High contrast white/gray for action */
+
+  --primary: 0 0% 90%;
+  /* #e5e5e5 - High contrast white/gray for action */
   --primary-foreground: 0 0% 10%;
-  
-  --secondary: 0 0% 20%;       /* #333333 */
-  --secondary-foreground: 0 0% 90%;
-  
+
+  --secondary: 0 0% 20%;
+  /* #333333 */
+  --secondary-foreground: 0 0% 95%;
+  /* Brightened from 90% */
+
   --muted: 0 0% 20%;
-  --muted-foreground: 0 0% 60%;
-  
+  --muted-foreground: 0 0% 75%;
+  /* Brightened from 60% (grey) to 75% (light grey) */
+
   --accent: 0 0% 25%;
   --accent-foreground: 0 0% 95%;
-  
-  --destructive: 0 84% 60%;    /* Red for critical alerts */
+
+  --destructive: 0 84% 60%;
+  /* Red for critical alerts */
   --destructive-foreground: 0 0% 100%;
 
   --border: 0 0% 20%;
   --input: 0 0% 20%;
   --ring: 0 0% 40%;
-  
+
   /* Status Colors */
-  --status-critical: 0 84% 60%;   /* Red */
-  --status-warning: 38 92% 50%;   /* Amber */
-  --status-ok: 150 90% 40%;       /* Green */
+  --status-critical: 0 84% 60%;
+  /* Red */
+  --status-warning: 38 92% 50%;
+  /* Amber */
+  --status-ok: 150 90% 40%;
+  /* Green */
 
   --font-sans: 'Inter', sans-serif;
   --font-mono: 'Roboto Mono', monospace;
@@ -47,11 +59,18 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground font-sans antialiased selection:bg-white/20;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply tracking-tight font-medium;
   }
 }
@@ -60,44 +79,127 @@
   .text-mono {
     font-family: var(--font-mono);
   }
-  
+
+  /* Forced Brightness Overrides for Common Dim Utility Classes */
+  /* This ensures user request for "brighter fonts" is met globally without refactoring everything */
+  .text-zinc-500 {
+    color: #a1a1aa !important;
+    /* Forces zinc-500 to look like zinc-400 */
+  }
+
+  .text-zinc-400 {
+    color: #e4e4e7 !important;
+    /* Forces zinc-400 to look like zinc-200 */
+  }
+
+  .text-muted-foreground {
+    color: hsl(var(--muted-foreground)) !important;
+  }
+
   /* Custom Scrollbar for dark theme */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+  /* Custom Scrollbar - Premium HUD Style */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
   }
-  ::-webkit-scrollbar-track {
-    background: #1a1a1a; 
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
   }
-  ::-webkit-scrollbar-thumb {
-    background: #333; 
-    border-radius: 4px;
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(34, 197, 94, 0.2);
+    border-radius: 3px;
+    border: 1px solid rgba(34, 197, 94, 0.1);
   }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #444; 
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(34, 197, 94, 0.5);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.4);
   }
-  
+
   /* Tactical Borders */
   .border-tactical {
-    @apply border border-white/10 shadow-[0_0_0_1px_rgba(0,0,0,0.5)];
+    @apply border border-white/10 shadow-[0_0_0_1px_rgba(0, 0, 0, 0.5)];
   }
 
   /* Scanline effect for video feeds */
   .scanline {
-    background: linear-gradient(
-      to bottom,
-      rgba(255,255,255,0),
-      rgba(255,255,255,0) 50%,
-      rgba(0,0,0,0.1) 50%,
-      rgba(0,0,0,0.1)
-    );
+    background: linear-gradient(to bottom,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0) 50%,
+        rgba(0, 0, 0, 0.1) 50%,
+        rgba(0, 0, 0, 0.1));
     background-size: 100% 4px;
     animation: scanline 10s linear infinite;
     pointer-events: none;
   }
-  
+
   @keyframes scanline {
-    0% { background-position: 0 0; }
-    100% { background-position: 0 100%; }
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: 0 100%;
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      transform: translateX(-100%);
+    }
+
+    to {
+      transform: translateX(100%);
+    }
+  }
+
+  @keyframes pulse-slow {
+
+    0%,
+    100% {
+      opacity: 0.8;
+    }
+
+    50% {
+      opacity: 0.4;
+    }
+  }
+
+  @keyframes spin-slow {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spin-reverse-slower {
+    from {
+      transform: rotate(360deg);
+    }
+
+    to {
+      transform: rotate(0deg);
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s linear infinite;
+  }
+
+  .animate-pulse-slow {
+    animation: pulse-slow 4s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin-slow 20s linear infinite;
+  }
+
+  .animate-spin-reverse-slower {
+    animation: spin-reverse-slower 30s linear infinite;
   }
 }

@@ -75,10 +75,54 @@ export async function registerRoutes(
   // Note: This runs on server start but checking if data exists first
   const existingDevices = await storage.getDevices();
   if (existingDevices.length === 0) {
-    await storage.createDevice({ name: "Cam-01 Main Gate", type: "camera", status: "online", location: "Zone A", ipAddress: "192.168.1.101", battery: null, videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4" });
-    await storage.createDevice({ name: "Cam-02 Loading Dock", type: "camera", status: "online", location: "Zone B", ipAddress: "192.168.1.102", battery: null, videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4" });
-    await storage.createDevice({ name: "Drone-Alpha", type: "drone", status: "warning", location: "Perimeter", ipAddress: "192.168.1.201", battery: 34, videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4" });
-    await storage.createDevice({ name: "Sensor-Perimeter-N", type: "sensor", status: "online", location: "North Wall", ipAddress: "192.168.1.55", battery: 88, videoUrl: null });
+    // Seed devices with coordinates mapped to the India Layer (centered approx 2500,2500)
+    await storage.createDevice({
+      name: "Cam-01 Delhi HQ",
+      type: "camera",
+      status: "online",
+      location: "Zone A",
+      ipAddress: "192.168.1.101",
+      battery: null,
+      videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+      x: 2500, // Delhi approx relative to map center
+      y: 2300
+    });
+
+    await storage.createDevice({
+      name: "Cam-02 Mumbai Port",
+      type: "camera",
+      status: "online",
+      location: "Zone B",
+      ipAddress: "192.168.1.102",
+      battery: null,
+      videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+      x: 2420, // Mumbai left/down
+      y: 2450
+    });
+
+    await storage.createDevice({
+      name: "Drone-Alpha Border",
+      type: "drone",
+      status: "warning",
+      location: "Perimeter",
+      ipAddress: "192.168.1.201",
+      battery: 34,
+      videoUrl: "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+      x: 2350, // Gujarat border area
+      y: 2400
+    });
+
+    await storage.createDevice({
+      name: "Sensor-Bangalore",
+      type: "sensor",
+      status: "online",
+      location: "South Hub",
+      ipAddress: "192.168.1.55",
+      battery: 88,
+      videoUrl: null,
+      x: 2500, // South center
+      y: 2550
+    });
 
     await storage.createAlert({ title: "Perimeter Breach", description: "Motion detected in Zone A (North)", severity: "critical", status: "active", location: "Zone A" });
     await storage.createAlert({ title: "Drone Battery Low", description: "Drone-Alpha battery below 35%", severity: "medium", status: "active", location: "Perimeter" });

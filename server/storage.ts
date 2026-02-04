@@ -85,7 +85,9 @@ export class MemStorage implements IStorage {
       lastPing: new Date(),
       battery: insertDevice.battery ?? null,
       ipAddress: insertDevice.ipAddress ?? null,
-      videoUrl: insertDevice.videoUrl ?? null
+      videoUrl: insertDevice.videoUrl ?? null,
+      x: insertDevice.x ?? 2500,
+      y: insertDevice.y ?? 2500
     };
     this.devices.push(device);
     return device;
